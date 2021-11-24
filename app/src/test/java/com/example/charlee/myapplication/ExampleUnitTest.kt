@@ -1,20 +1,13 @@
 package com.example.charlee.myapplication
 
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 import java.io.InputStream
-import java.io.OutputStream
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -87,7 +80,7 @@ class ExampleUnitTest {
             delay(1000)
             println("request send to server")
             delay(1000)
-            println("get response by server")
+            println("get response from server")
             val inputStream =
                 "HTTP/1.1 200 OK\r\nContent-Type:text/plain\r\n\r\n<html>welcome to baidu<\\htm>".byteInputStream()
             emit(inputStream)
@@ -101,7 +94,7 @@ class ExampleUnitTest {
             delay(1000)
             val lines = inputStream.bufferedReader().readLines()
             val header = lines[1].split(":")
-            val response = HttpResponse(lines[0], mapOf(Pair(header[0], header[1])), lines[2])
+            val response = HttpResponse(lines[0], mapOf(Pair(header[0], header[1])), lines[3])
             emit(response)
         }
     }
@@ -112,7 +105,7 @@ class ExampleUnitTest {
             val responseBody = httpResponse.responseBody
             println("render html by browser")
             delay(2000)
-            println("html showed")
+            println("html showed $responseBody")
             emit(true)
         }
     }
