@@ -49,17 +49,17 @@ class ExampleUnitTest {
       buildHttpRequest()
         .flatMapConcat { sendRequest(it).flowOn(IO) }
         .flatMapConcat {
-          buildHttpResponse(it).flowOn(IO).combine(buildKwaiVideoResponse(it).flowOn(IO).buffer()) { a, b ->
+          buildHttpResponse(it).flowOn(IO).combine(buildKwaiVideoResponse(it).flowOn(IO)) { a, b ->
             Result(a, b)
           }
-        }
+        }.conflate()
         .flatMapConcat {
-            combine(saveResponseToCache(it.httpResponse).flowOn(IO),
-              htmlRender(it.httpResponse).flowOn(customerDispatcher),
-              playVideo(it.kwaiVideoResponse).flowOn(IO)) { a, b, c ->
-              lastHttpResponse = it.httpResponse
-              a && b && c
-            }
+          combine(saveResponseToCache(it.httpResponse).flowOn(IO),
+            htmlRender(it.httpResponse).flowOn(customerDispatcher),
+            playVideo(it.kwaiVideoResponse).flowOn(IO)) { a, b, c ->
+            lastHttpResponse = it.httpResponse
+            a && b && c
+          }
         }.collect {
           if (it) {
             printlnWithThreadName("network ok!!!")
